@@ -112,6 +112,24 @@ class ChannelTest {
     }
 
     @Test
+    fun `deleteChannel() should return a DeleteChannelResult object`() {
+        mockServer.expect()
+                .post()
+                .withPath("/api/v1/channels.delete")
+                .andReturn(200, DELETE_CHANNEL_OK)
+                .once()
+
+        runBlocking {
+            val result = sut.deleteChannel(
+                    roomType = RoomType.Channel(),
+                    roomId = "GENERAL"
+            )
+
+            assertThat(result.success, isEqualTo(true))
+        }
+    }
+
+    @Test
     fun `createDirectMessage() should return true and yield no exceptions`() {
         mockServer.expect()
             .post()

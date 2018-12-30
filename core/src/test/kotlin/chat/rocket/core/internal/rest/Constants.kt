@@ -227,3 +227,5 @@ const val CREATE_DM_OK = """
     "success": true
 }
 """
+
+const val DELETE_CHANNEL_OK = "{\"success\":true}"
