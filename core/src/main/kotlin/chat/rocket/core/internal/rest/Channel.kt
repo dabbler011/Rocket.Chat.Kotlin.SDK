@@ -5,6 +5,8 @@ import chat.rocket.core.RocketChatClient
 import chat.rocket.core.internal.RestResult
 import chat.rocket.core.internal.model.CreateDirectMessagePayload
 import chat.rocket.core.internal.model.CreateNewChannelPayload
+import chat.rocket.core.internal.model.DeleteChannelPayload
+import chat.rocket.core.internal.model.DeleteChannelResult
 import chat.rocket.core.model.DirectMessage
 import chat.rocket.core.model.Room
 import com.squareup.moshi.Types
@@ -38,6 +40,29 @@ suspend fun RocketChatClient.createChannel(
 
     return@withContext handleRestCall<RestResult<Room>>(request, type).result()
 }
+
+/**
+ * Deletes the chat room.
+ *
+ * @param roomType The type of the room.
+ * @param roomId ID of the room
+ * @return True if the channel was deleted, false otherwise.
+ */
+suspend fun RocketChatClient.deleteChannel(
+        roomType: RoomType,
+        roomId: String
+): DeleteChannelResult = withContext(CommonPool) {
+        val payload = DeleteChannelPayload(roomId = roomId)
+        val adapter = moshi.adapter(DeleteChannelPayload::class.java)
+        val payloadBody = adapter.toJson(payload)
+
+        val body = RequestBody.create(MEDIA_TYPE_JSON,payloadBody)
+
+        val url = requestUrl(restUrl, getRestApiMethodNameByRoomType(roomType,"delete")).build()
+        val request = requestBuilderForAuthenticatedMethods(url).post(body).build()
+
+        return@withContext handleRestCall<DeleteChannelResult>(request,DeleteChannelResult::class.java)
+    }
 
 /**
  * Create a direct message (DM) room with an user.
